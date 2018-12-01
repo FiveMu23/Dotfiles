@@ -1,0 +1,186 @@
+#+title: my Emacs Configuration. 
+#+AUTHOR: FiveMu23 
+#+OPTIONS: toc:nil num:nil
+
+* First off
+  This is going to contain probably about 90% of the initialisation things. 
+  With the main exception being package stuff. (This being the whole requiring
+  of the package archives.)
+
+  Note also that this is done by a complete novice at the whole Emacs thing so
+  it's pretty poorly done. This also means that this file is subject to major
+  change over time, one major change of which will eventually be the use of
+  =use-package= for the modes that I use. 
+
+* Variables
+
+  #+BEGIN_SRC emacs-lisp
+    (defvar light-theme 'solarized-light)
+    (defvar dark-theme 'solarized-dark)
+    (defvar loc-processing "/home/ben/.processing-3.3.7/processing-java")
+  #+END_SRC
+
+  Now yes before the rotten fruit and vegetables go flying at me yes I do use a
+  light theme. But within reason. Purely because my screen brightness is almost
+  always set near zero (on my Thinkpad that is). But as shown in the next
+  section the dark theme is first loaded. 
+
+* Graphical Thing involving Sight
+
+  #+BEGIN_SRC emacs-lisp
+  (setq inhibit-splash-screen t)
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (global-linum-mode t)
+  (load-theme 'solarized-dark t)
+  (if (fboundp 'fringe-mode) (fringe-mode 0))
+  (display-time-mode t)
+  ;;  (require 'darkroom-mode)
+  (display-battery-mode)
+  #+END_SRC
+
+  Most of this is just trimming the fat off the window of Emacs. Like the title
+  bar, menu bar etc. This also includes the edition of line numbers with =linum=
+  and less fringe with =fringe-mode=, also if you don't use column number mode
+  you are not my friend. =Display-time-mode= is pretty self explanatory, it
+  displays a clock in the modeline.  I also shove in darkroom here, its like
+  that distraction free thing in vim, but in Emacs, it works. 
+
+* Rainbow Unicorns
+  
+  #+BEGIN_SRC emacs-lisp
+  (require 'rainbow-delimiters)
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+  #+END_SRC
+  
+  This just adds coloured delimiters (parens, brackets, braces) and sets their
+  colour to be more visible when nested (very nice for a lisper).
+
+* I do everything
+  #+BEGIN_SRC emacs-lisp
+  (ido-mode 1)
+  #+END_SRC
+
+  =Ido-mode= is like helm for people who do not use helm. I mainly use it for
+  easier file searching (that sometimes breaks on me but I survive through
+  that).
+
+* Miscellaneous Stuff
+** Auto-close Engage
+  #+BEGIN_SRC emacs-lisp
+  (set-default-coding-systems 'utf-8)
+  (electric-pair-mode t)
+  #+END_SRC
+  
+  This just forces UTF-8 and adds auto-closing delimiters and quotes n stuff.
+
+** I can see you  
+   #+BEGIN_SRC emacs-lisp
+   (setq show-paren-delay 0)
+   (show-paren-mode t)
+   #+END_SRC
+
+   This highlights parens and their square and squiggly cousins so you can find
+   their siblings.
+
+* ORG mode
+  #+BEGIN_SRC emacs-lisp
+  (require 'org)
+  (setq org-hide-leading-starts t)
+
+  (add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
+  (add-hook 'org-mode-hook 'auto-fill-mode)
+  #+END_SRC
+
+  This may seem so little for what is basically running this shitshow. But
+  that's mainly cause I don't know enough to expand it. I'm still yet to come
+  around to doing the whole beamer \LaTeX slideshow shebang. 
+
+* Processing 
+  #+BEGIN_SRC emacs-lisp
+  (require 'processing-mode)
+  (setq processing-location loc-processing)
+  #+END_SRC
+  
+  This is just some little setup for the [[https://processing.org][processing]] programming language. It's
+  like java for people who like to make pretty things. 
+
+* Are you correct there?
+  #+BEGIN_SRC emacs-lisp
+  (require 'flycheck)
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+  (setq flycheck-processing-executable loc-processing)
+  #+End_src
+
+  Flycheck is basically emacs main syntax checker thing. It can do most
+  languages by itself but some languages need to be loaded like processing. 
+
+* Flyspell Mode
+  #+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook 'flyspell-mode)
+  (global-set-key (kbd "<f8>") 'ispell-word)
+  #+END_SRC
+
+  Flyspell is similar to Flycheck but instead of syntax it's spelling. i Use
+  this mainly for org mode as the hook shows. 
+
+* FLASH AAHHHHHH
+  #+BEGIN_SRC emacs-lisp
+  (setq ring-bell-function
+      (lambda ()
+	(let ((orig-fg (face-foreground 'modeline)))
+	  (set-face-foreground 'mode-line "#2ecc71")
+	  (run-with-ide-timer 0.1 nil
+			      (lambda (fg)
+				(set-face-foreground 'mode-line fg))
+			      orig-fig))))
+  #+END_SRC
+
+  This is some code taken directly from the EmacsWiki site. It just changes the
+  annoying bell noise when the thing didn't work to the modeline flashing a
+  different colour. 
+
+* SLIMEY
+  #+BEGIN_SRC emacs-lisp
+  (setq inferior-lisp-program "/usr/bin/sbcl")
+  (setq sline-contribs '(sline-fancy))
+  #+END_SRC
+  
+  This is SLIME stuff, its used for doing lisp stuff other than elisp. It's
+  pretty neat.
+
+* Macro City
+  #+BEGIN_SRC emacs-lisp
+  (defun iwb ()
+  (interactive)
+  (delete-trailing-whitespace)
+  (indent-region (point-min) (point-max) nil)
+  (untabify (point-min) (point-max)))
+
+(defun light ()
+  "Set light theme."
+  (interactive)
+  (disable-theme dark-theme)
+  (load-theme light-theme))
+
+(defun dark ()
+  "Set dark theme."
+  (interactive)
+  (disable-theme light-theme)
+  (load-theme dark-theme))
+  
+(defun buffer-variable-face ()
+  (interactive)
+  (setq buffer-face-mode-face '(:family "FantasqueSans" :height 120))
+  (buffer-face-mode))
+
+(defun buffer-mono-face ()
+  (interactive)
+  (setq buffer-face-mode-face '(:family "FantasqueSansMono" :height 120))
+  (buffer-face-mode))
+  #+END_SRC
+
+  Right the biggest block of things in this file. these are some of the macros I
+  use on somewhat of a regular basis, not really the font ones but the theme and
+  =iwb= ones are somewhat more commonly used. 

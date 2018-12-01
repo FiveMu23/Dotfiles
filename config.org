@@ -17,7 +17,7 @@
   #+BEGIN_SRC emacs-lisp
     (defvar light-theme 'solarized-light)
     (defvar dark-theme 'solarized-dark)
-    (defvar loc-processing "/home/ben/.processing-3.3.7/processing-java")
+    (defvar loc-processing "~/.processing-3.3.7/processing-java")
   #+END_SRC
 
   Now yes before the rotten fruit and vegetables go flying at me yes I do use a
